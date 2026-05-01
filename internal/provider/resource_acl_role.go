@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -80,8 +81,12 @@ func (r *ACLRoleResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 			},
 			"value": schema.StringAttribute{
-				Description: "The value of the ACL role (used internally by CiviCRM).",
+				Description: "The value of the ACL role (used internally by CiviCRM to link ACL rules and entity roles). If not specified, CiviCRM auto-generates it. Use this value when referencing the role in civicrm_acl and civicrm_acl_entity_role resources.",
+				Optional:    true,
 				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -142,6 +147,10 @@ func (r *ACLRoleResource) Create(ctx context.Context, req resource.CreateRequest
 
 	if !plan.Weight.IsNull() {
 		values["weight"] = plan.Weight.ValueInt64()
+	}
+
+	if !plan.Value.IsNull() {
+		values["value"] = plan.Value.ValueString()
 	}
 
 	// Call API
@@ -279,6 +288,10 @@ func (r *ACLRoleResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	if !plan.Weight.IsNull() {
 		values["weight"] = plan.Weight.ValueInt64()
+	}
+
+	if !plan.Value.IsNull() {
+		values["value"] = plan.Value.ValueString()
 	}
 
 	// Call API

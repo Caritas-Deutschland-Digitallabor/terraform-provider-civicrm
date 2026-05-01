@@ -57,7 +57,7 @@ func (r *ACLEntityRoleResource) Schema(ctx context.Context, req resource.SchemaR
 				},
 			},
 			"acl_role_id": schema.Int64Attribute{
-				Description: "The ID of the ACL role to assign.",
+				Description: "The value field of the ACL role to assign. Use tonumber(civicrm_acl_role.example.value) to reference an ACL role.",
 				Required:    true,
 			},
 			"entity_table": schema.StringAttribute{

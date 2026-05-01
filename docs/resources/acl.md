@@ -13,9 +13,10 @@ Manages a CiviCRM ACL rule. ACL rules define what operations (View, Edit, Create
 
 ```terraform
 # Grant edit access to a group
+# Note: entity_id must reference the ACL role's 'value' field, not 'id'
 resource "civicrm_acl" "managers_edit_volunteers" {
   name         = "managers_edit_volunteers"
-  entity_id    = civicrm_acl_role.volunteer_manager.id
+  entity_id    = tonumber(civicrm_acl_role.volunteer_manager.value)
   operation    = "Edit"
   object_table = "civicrm_group"
   object_id    = civicrm_group.volunteers.id
@@ -25,7 +26,7 @@ resource "civicrm_acl" "managers_edit_volunteers" {
 # Grant view-only access
 resource "civicrm_acl" "viewers_view_volunteers" {
   name         = "viewers_view_volunteers"
-  entity_id    = civicrm_acl_role.data_viewer.id
+  entity_id    = tonumber(civicrm_acl_role.data_viewer.value)
   operation    = "View"
   object_table = "civicrm_group"
   object_id    = civicrm_group.volunteers.id
@@ -35,7 +36,7 @@ resource "civicrm_acl" "viewers_view_volunteers" {
 # Grant access to all contacts (object_id = 0)
 resource "civicrm_acl" "admins_edit_all" {
   name         = "admins_edit_all_contacts"
-  entity_id    = civicrm_acl_role.admin.id
+  entity_id    = tonumber(civicrm_acl_role.admin.value)
   operation    = "Edit"
   object_table = "civicrm_group"
   object_id    = 0
@@ -43,13 +44,15 @@ resource "civicrm_acl" "admins_edit_all" {
 }
 ```
 
+~> **Important:** The `entity_id` field must reference the ACL role's `value` attribute, not its `id`. CiviCRM internally uses the `value` field to link ACL rules to roles. Use `tonumber()` to convert the string value to a number.
+
 ## Argument Reference
 
 The following arguments are supported:
 
 ### Required
 
-- `entity_id` (Number) The ID of the ACL role this rule applies to.
+- `entity_id` (Number) The `value` field of the ACL role this rule applies to. Use `tonumber(civicrm_acl_role.example.value)` to reference an ACL role.
 - `name` (String) The machine name of the ACL rule (must be unique).
 - `object_id` (Number) The ID of the object (e.g., group ID) this rule applies to. Use `0` for all objects.
 - `object_table` (String) The table/entity type this rule applies to (e.g., `civicrm_group`).

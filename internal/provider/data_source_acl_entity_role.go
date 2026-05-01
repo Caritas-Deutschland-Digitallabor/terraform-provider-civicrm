@@ -43,7 +43,7 @@ func (d *ACLEntityRoleDataSource) Schema(ctx context.Context, req datasource.Sch
 				Computed:    true,
 			},
 			"acl_role_id": schema.Int64Attribute{
-				Description: "The ID of the ACL role. Use with entity_id to look up by combination.",
+				Description: "The value field of the ACL role. Use with entity_id to look up by combination.",
 				Optional:    true,
 				Computed:    true,
 			},
