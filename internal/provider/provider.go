@@ -174,6 +174,7 @@ func (p *CiviCRMProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewContactTypeResource,
 		NewRelationshipTypeResource,
 		NewCaseTypeResource,
+		NewTagsetResource,
 	}
 }
 
