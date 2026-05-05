@@ -174,6 +174,11 @@ func (p *CiviCRMProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewContactTypeResource,
 		NewRelationshipTypeResource,
 		NewCaseTypeResource,
+		NewCaseStatusResource,
+		NewCiviRulesRuleResource,
+		NewCiviRulesTriggerResource,
+		NewCiviRulesRuleConditionResource,
+		NewCiviRulesRuleActionResource,
 		NewTagsetResource,
 	}
 }
@@ -184,5 +189,12 @@ func (p *CiviCRMProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewACLRoleDataSource,
 		NewACLDataSource,
 		NewACLEntityRoleDataSource,
+		NewRelationshipTypeDataSource,
+		NewCaseTypeDataSource,
+		NewCaseStatusDataSource,
+		NewCiviRulesRuleDataSource,
+		NewCiviRulesTriggerDataSource,
+		NewCiviRulesConditionDataSource,
+		NewCiviRulesActionDataSource,
 	}
 }
