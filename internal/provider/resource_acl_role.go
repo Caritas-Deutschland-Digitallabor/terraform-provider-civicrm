@@ -192,6 +192,8 @@ func (r *ACLRoleResource) Create(ctx context.Context, req resource.CreateRequest
 
 	if value, ok := GetString(result, "value"); ok {
 		plan.Value = types.StringValue(value)
+	} else {
+		plan.Value = types.StringNull()
 	}
 
 	tflog.Debug(ctx, "Created ACL role", map[string]any{
@@ -331,6 +333,8 @@ func (r *ACLRoleResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	if value, ok := GetString(result, "value"); ok {
 		plan.Value = types.StringValue(value)
+	} else {
+		plan.Value = types.StringNull()
 	}
 
 	tflog.Debug(ctx, "Updated ACL role", map[string]any{

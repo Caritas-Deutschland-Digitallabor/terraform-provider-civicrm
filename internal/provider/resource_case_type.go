@@ -160,6 +160,14 @@ func (r *CaseTypeResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	// CiviCRM returns definition as XML from Create but as a structured object from GET.
+	// Re-read to get the canonical JSON form so state is consistent with subsequent reads.
+	if id, ok := GetInt64(result, "id"); ok {
+		if freshResult, err := r.client.GetByID("CaseType", id, nil); err == nil {
+			result = freshResult
+		}
+	}
+
 	r.mapResultToState(result, &plan)
 
 	tflog.Debug(ctx, "Created CaseType", map[string]any{"id": plan.ID.ValueInt64()})
@@ -246,6 +254,11 @@ func (r *CaseTypeResource) Update(ctx context.Context, req resource.UpdateReques
 			"Could not update CaseType ID "+strconv.FormatInt(state.ID.ValueInt64(), 10)+": "+err.Error(),
 		)
 		return
+	}
+
+	// Re-read to get canonical JSON form (Update response returns XML like Create).
+	if freshResult, err := r.client.GetByID("CaseType", state.ID.ValueInt64(), nil); err == nil {
+		result = freshResult
 	}
 
 	plan.ID = state.ID
