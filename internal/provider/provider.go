@@ -180,6 +180,10 @@ func (p *CiviCRMProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewCiviRulesRuleConditionResource,
 		NewCiviRulesRuleActionResource,
 		NewTagsetResource,
+		NewMembershipTypeResource,
+		NewPriceSetResource,
+		NewPriceFieldResource,
+		NewPriceFieldValueResource,
 	}
 }
 
@@ -196,5 +200,6 @@ func (p *CiviCRMProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewCiviRulesTriggerDataSource,
 		NewCiviRulesConditionDataSource,
 		NewCiviRulesActionDataSource,
+		NewMembershipTypeDataSource,
 	}
 }
