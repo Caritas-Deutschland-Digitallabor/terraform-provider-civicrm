@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -234,14 +235,31 @@ func GetInt64(m map[string]any, key string) (int64, bool) {
 	}
 }
 
-// GetString safely extracts a string from a map value
+// GetString safely extracts a string from a map value.
+// CiviCRM's API v4 may return string-typed fields (e.g. OptionValue.value) as
+// JSON numbers, so numeric types are converted to their decimal string form.
 func GetString(m map[string]any, key string) (string, bool) {
 	v, ok := m[key]
-	if !ok {
+	if !ok || v == nil {
 		return "", false
 	}
-	s, ok := v.(string)
-	return s, ok
+	switch val := v.(type) {
+	case string:
+		return val, true
+	case float64:
+		if val == float64(int64(val)) {
+			return strconv.FormatInt(int64(val), 10), true
+		}
+		return strconv.FormatFloat(val, 'f', -1, 64), true
+	case int64:
+		return strconv.FormatInt(val, 10), true
+	case int:
+		return strconv.FormatInt(int64(val), 10), true
+	case json.Number:
+		return val.String(), true
+	default:
+		return "", false
+	}
 }
 
 // GetBool safely extracts a bool from a map value
