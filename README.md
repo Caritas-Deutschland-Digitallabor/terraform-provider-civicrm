@@ -41,6 +41,21 @@ This provider supports managing the following CiviCRM resources:
 - **ACL Roles** (`civicrm_acl_role`) - Permission roles that define access levels
 - **ACLs** (`civicrm_acl`) - Access control rules defining what operations a role can perform
 - **ACL Entity Roles** (`civicrm_acl_entity_role`) - Assigns ACL roles to groups (role bindings)
+- **Custom Groups** (`civicrm_custom_group`) - Custom field sets attached to CiviCRM entities
+- **Custom Fields** (`civicrm_custom_field`) - Individual custom fields within a custom group
+- **Tags** (`civicrm_tag`) - Tags for categorising contacts and other entities
+- **Tagsets** (`civicrm_tagset`) - Named collections of tags
+- **Contact Types** (`civicrm_contact_type`) - Custom contact subtypes
+- **Relationship Types** (`civicrm_relationship_type`) - Named relationship types between contacts
+- **Case Types** (`civicrm_case_type`) - Case structures with activity types and case roles
+- **Case Statuses** (`civicrm_case_status`) - Status options for cases
+- **Membership Types** (`civicrm_membership_type`) - Membership definitions including fees, duration, and renewal rules
+- **Mail Settings** (`civicrm_mail_settings`) - Inbound mail account configuration
+- **Site Email Addresses** (`civicrm_site_email_address`) - From-addresses used by CiviCRM when sending mail
+- **CiviRules Rules** (`civicrm_civirules_rule`) - Automation rules triggered by CiviCRM events
+- **CiviRules Triggers** (`civicrm_civirules_trigger`) - Trigger definitions for CiviRules
+- **CiviRules Rule Conditions** (`civicrm_civirules_rule_condition`) - Conditions attached to CiviRules rules
+- **CiviRules Rule Actions** (`civicrm_civirules_rule_action`) - Actions executed by CiviRules rules
 
 Each resource also has a corresponding data source for read-only lookups.
 

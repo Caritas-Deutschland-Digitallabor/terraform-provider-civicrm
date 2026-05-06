@@ -373,6 +373,8 @@ func (r *ACLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	if !plan.Priority.IsNull() {
 		values["priority"] = plan.Priority.ValueInt64()
+	} else {
+		values["priority"] = nil
 	}
 
 	// Call API

@@ -1,0 +1,107 @@
+name: BPMN → CiviCase Terraform
+
+on:
+  push:
+    paths:
+      - "bpmn/**/*.bpmn"
+  workflow_dispatch:
+    inputs:
+      bpmn_glob:
+        description: "Glob pattern for BPMN files (default: bpmn/**/*.bpmn)"
+        required: false
+        default: "bpmn/**/*.bpmn"
+      terraform_output_dir:
+        description: "Target directory for generated .tf files"
+        required: false
+        default: "terraform/case-types"
+
+env:
+  BPMN_GLOB: ${{ github.event.inputs.bpmn_glob || 'bpmn/**/*.bpmn' }}
+  TF_OUTPUT_DIR: ${{ github.event.inputs.terraform_output_dir || 'terraform/case-types' }}
+
+jobs:
+  convert:
+    name: Convert BPMN to Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Create output directory
+        run: mkdir -p "$TF_OUTPUT_DIR"
+
+      - name: Convert BPMN files
+        id: convert
+        run: |
+          set -euo pipefail
+          CONVERTED=0
+          FAILED=0
+          REPORT=""
+
+          for bpmn_file in $(find . -path "./$BPMN_GLOB" -name "*.bpmn" 2>/dev/null || true); do
+            echo "Processing: $bpmn_file"
+            stem=$(basename "$bpmn_file" .bpmn)
+            out_file="$TF_OUTPUT_DIR/${stem}.tf"
+
+            if python3 tools/bpmn_to_terraform/bpmn_to_civicase.py \
+                "$bpmn_file" \
+                --output "$out_file" \
+                2>"/tmp/${stem}.stderr"; then
+              echo "  → $out_file"
+              CONVERTED=$((CONVERTED + 1))
+              # Append mapping report as a comment block
+              mapping=$(python3 tools/bpmn_to_terraform/bpmn_to_civicase.py "$bpmn_file" --print-mapping 2>/dev/null || true)
+              if [ -n "$mapping" ]; then
+                echo "" >> "$out_file"
+                echo "# --- Mapping Report ---" >> "$out_file"
+                while IFS= read -r line; do
+                  echo "# $line" >> "$out_file"
+                done <<< "$mapping"
+              fi
+            else
+              echo "  ERROR converting $bpmn_file:"
+              cat "/tmp/${stem}.stderr" || true
+              FAILED=$((FAILED + 1))
+            fi
+          done
+
+          echo "converted=$CONVERTED" >> "$GITHUB_OUTPUT"
+          echo "failed=$FAILED"       >> "$GITHUB_OUTPUT"
+          echo "Converted: $CONVERTED, Failed: $FAILED"
+
+          if [ "$FAILED" -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Print generated files
+        if: always()
+        run: |
+          echo "Generated Terraform files in $TF_OUTPUT_DIR:"
+          find "$TF_OUTPUT_DIR" -name "*.tf" -exec echo "  {}" \; 2>/dev/null || echo "  (none)"
+
+      - name: Upload generated Terraform files
+        uses: actions/upload-artifact@v4
+        if: steps.convert.outputs.converted != '0'
+        with:
+          name: civicase-terraform-${{ github.run_number }}
+          path: ${{ env.TF_OUTPUT_DIR }}/**/*.tf
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## BPMN → CiviCase Conversion" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| File | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|--------|" >> "$GITHUB_STEP_SUMMARY"
+          for tf_file in $(find "$TF_OUTPUT_DIR" -name "*.tf" 2>/dev/null || true); do
+            echo "| \`$tf_file\` | ✅ generated |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Converted: **${{ steps.convert.outputs.converted }}** files" >> "$GITHUB_STEP_SUMMARY"

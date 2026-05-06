@@ -184,6 +184,7 @@ func (p *CiviCRMProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewPriceSetResource,
 		NewPriceFieldResource,
 		NewPriceFieldValueResource,
+		// END GENERATED RESOURCES
 	}
 }
 
@@ -201,5 +202,6 @@ func (p *CiviCRMProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewCiviRulesConditionDataSource,
 		NewCiviRulesActionDataSource,
 		NewMembershipTypeDataSource,
+		// END GENERATED DATASOURCES
 	}
 }
