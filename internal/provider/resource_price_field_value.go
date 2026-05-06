@@ -34,7 +34,7 @@ type PriceFieldValueResourceModel struct {
 	HelpPre             types.String  `tfsdk:"help_pre"`
 	HelpPost            types.String  `tfsdk:"help_post"`
 	Amount              types.Float64 `tfsdk:"amount"`
-	Count               types.Int64   `tfsdk:"count"`
+	Count               types.Int64   `tfsdk:"participant_count"`
 	MaxValue            types.Int64   `tfsdk:"max_value"`
 	Weight              types.Int64   `tfsdk:"weight"`
 	MembershipTypeID    types.Int64   `tfsdk:"membership_type_id"`
@@ -96,7 +96,7 @@ func (r *PriceFieldValueResource) Schema(ctx context.Context, req resource.Schem
 				Description: "Price amount for this value.",
 				Required:    true,
 			},
-			"count": schema.Int64Attribute{
+			"participant_count": schema.Int64Attribute{
 				Description: "Number of participants this value counts for.",
 				Optional:    true,
 				Computed:    true,
